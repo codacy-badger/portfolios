@@ -1,11 +1,19 @@
 language: node_js
-before_script:
-  - npm install -g gatsby-cli
+cache:
+  directories:
+    - ~/.npm
 node_js:
   - "10"
+git:
+  depth: 3
+script:
+  - yarn build --prefix-paths
 deploy:
-  provider: script
-  script: cd docs/ && yarn install && yarn run deploy
+  provider: pages
   skip_cleanup: true
+  keep_history: true
+  github_token: $GH_TOKEN
+  local_dir: public
+  target_branch: gh-pages
   on:
     branch: master

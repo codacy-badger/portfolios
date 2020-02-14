@@ -1,5 +1,5 @@
 module.exports = {
-  pathPrefix: '/terminal',
+  pathPrefix: '/portfolios',
   siteMetadata: {
     title: `PortfoliOS`,
     description: `A terminal emulator written in Gatsby`,

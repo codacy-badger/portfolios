@@ -1,0 +1,32 @@
+{
+    "compilerOptions": {
+      "module": "commonjs",
+      "target": "esnext",
+      "noImplicitAny": true,
+      "strict": true,
+      "jsx": "react",
+      "charset": "utf8",
+      "lib": ["dom", "esnext"],
+      "typeRoots": ["./node_modules/@types", "./src/@types"],
+      "types": ["styled-components", "react", "react-dom", "node"],
+      "baseUrl": "src",
+      "paths": {
+        "@/*": ["*"],
+        "@components": ["components"],
+        "@components/*": ["components/*"],
+        "@pages": ["pages"],
+      },
+      "noEmit": true,
+      "sourceMap": true,
+      "esModuleInterop": true,
+      "noUnusedLocals": false
+    },
+    "compileOnSave": false,
+    "exclude": [
+      "node_modules",
+      "public",
+      ".cache",
+    ],
+    "include": ["./src"]
+  }
+  

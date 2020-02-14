@@ -1,11 +1,13 @@
 module.exports = {
+  pathPrefix: '/terminal',
   siteMetadata: {
-    title: `Gatsby Default Starter`,
-    description: `Kick off your next, great Gatsby project with this default starter. This barebones starter ships with the main Gatsby configuration files you might need.`,
-    author: `@gatsbyjs`,
+    title: `PortfoliOS`,
+    description: `A terminal emulator written in Gatsby`,
+    author: `@richardnguyen99`,
   },
   plugins: [
     `gatsby-plugin-react-helmet`,
+    `gatsby-plugin-typescript`,
     {
       resolve: `gatsby-source-filesystem`,
       options: {

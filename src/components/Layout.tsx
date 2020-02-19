@@ -6,11 +6,10 @@
  */
 
 import React from 'react'
-import PropTypes from 'prop-types'
 import { useStaticQuery, graphql } from 'gatsby'
 
+import GlobalStyle from './GlobalStyle'
 import Header from './Header'
-import './layout.css'
 
 interface LayoutProps {
   children: React.ReactNode | React.ReactNode[]
@@ -29,6 +28,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
   return (
     <>
+      <GlobalStyle />
       <Header siteTitle={data.site.siteMetadata.title} />
       <div
         style={{
@@ -48,10 +48,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       </div>
     </>
   )
-}
-
-Layout.propTypes = {
-  children: PropTypes.node.isRequired,
 }
 
 export default Layout

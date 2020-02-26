@@ -1,8 +1,5 @@
-import React, { useState, useRef, useCallback, useEffect } from 'react'
+import React, { useState, useCallback, useEffect } from 'react'
 import styled from 'styled-components'
-import Draggable from 'react-draggable'
-
-import { Heading } from '@components'
 
 const StyledBtn = styled.button`
   border-radius: 50%;
@@ -93,71 +90,68 @@ const StyledTerminal = styled.div`
 `
 
 const Terminal: React.FC = () => {
-  const [posX, setPosX] = useState<number>(20)
-  const [posY, setPosY] = useState<number>(20)
+  const [state, setState] = useState({
+    isDragging: false,
+    dX: 20,
+    dY: 20,
+  })
 
-  const draggableRef = useRef<HTMLDivElement>(null)
-  const dragging = useRef<boolean>(false)
+  const onMouseMove = useCallback(
+    e => {
+      if (state.isDragging) {
+        setState(prevState => ({
+          ...prevState,
+          dX: prevState.dX + e.movementX,
+          dY: prevState.dY + e.movementY,
+        }))
+      }
+    },
+    [state.isDragging]
+  )
 
-  const matchSelector = (
-    e: EventTarget | null,
-    selector: string,
-    node: (Node & ParentNode) | null
-  ): boolean => {
-    if (node !== null) {
-      return !!node.querySelector(selector)
-    }
-    return false
-  }
-
-  const onMouseDown = useCallback((e: MouseEvent) => {
-    if (
-      draggableRef.current &&
-      matchSelector(e.target, '#handle', draggableRef.current.parentNode)
-    ) {
-      dragging.current = true
-    }
+  const onMouseDown = useCallback(() => {
+    setState(prevState => ({
+      ...prevState,
+      isDragging: true,
+    }))
   }, [])
 
   const onMouseUp = useCallback(() => {
-    if (dragging.current) {
-      dragging.current = false
+    if (state.isDragging) {
+      setState(prevState => ({
+        ...prevState,
+        isDragging: false,
+      }))
     }
-  }, [])
-
-  const onMouseMove = useCallback((e: MouseEvent) => {
-    if (dragging.current) {
-      setPosX(pos => pos + e.movementX)
-      setPosY(pos => pos + e.movementY)
-    }
-  }, [])
+  }, [state.isDragging])
 
   useEffect(() => {
-    window.addEventListener('mouseup', onMouseUp)
-    window.addEventListener('mousedown', onMouseDown)
     window.addEventListener('mousemove', onMouseMove)
+    window.addEventListener('mouseup', onMouseUp)
 
     return (): void => {
-      window.removeEventListener('mouseup', onMouseUp)
-      window.removeEventListener('mousedown', onMouseDown)
       window.removeEventListener('mousemove', onMouseMove)
+      window.removeEventListener('mouseup', onMouseUp)
     }
-  }, [onMouseUp, onMouseDown, onMouseMove])
+  }, [onMouseMove, onMouseUp])
 
   return (
-    <Draggable handle="#handle">
-      <StyledTerminal>
-        <StyledHeading id="handle">
-          <StyledBtnContainer>
-            <StyledBtnRed />
-            <StyledBtnYellow />
-            <StyledBtnGreen />
-          </StyledBtnContainer>
-          <StyledTitle>Children</StyledTitle>
-        </StyledHeading>
-        <StyledConsole>Hello</StyledConsole>
-      </StyledTerminal>
-    </Draggable>
+    <StyledTerminal
+      style={{
+        left: `${state.dX.toString().concat('px')}`,
+        top: `${state.dY.toString().concat('px')}`,
+      }}
+    >
+      <StyledHeading onMouseDown={onMouseDown}>
+        <StyledBtnContainer>
+          <StyledBtnRed />
+          <StyledBtnYellow />
+          <StyledBtnGreen />
+        </StyledBtnContainer>
+        <StyledTitle>Children</StyledTitle>
+      </StyledHeading>
+      <StyledConsole>Hello</StyledConsole>
+    </StyledTerminal>
   )
 }
 

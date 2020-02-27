@@ -35,13 +35,13 @@ const StyledBtnContainer = styled.div`
 const StyledTitle = styled.h1`
   margin: 0 auto;
 
-  color: white;
+  color: #fafafa;
   line-height: 1;
-  height: 14px;
+  height: 12px;
 
   font-family: --apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
     Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 400;
 `
 
@@ -51,13 +51,17 @@ const StyledHeading = styled.div`
   position: relative;
 
   margin: 0;
-  padding: 0.5rem;
+  padding: 0.375rem;
 
-  border-top-left-radius: 8px;
-  border-top-right-radius: 8px;
-  background: black;
+  color: #fafafa;
+  background: #202020;
 
   width: auto;
+
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+
+  box-sizing: border-box;
 `
 
 const StyledConsole = styled.p`
@@ -67,15 +71,15 @@ const StyledConsole = styled.p`
   font-weight: normal;
   font-size: 12px;
 
-  border-bottom-left-radius: 8px;
-  border-bottom-right-radius: 8px;
-
-  color: white;
-  background: black;
+  color: #fafafa;
+  background: #202020;
 
   margin: 0;
 
   height: 100%;
+
+  border-bottom-right-radius: 5px;
+  border-bottom-left-radius: 5px;
 `
 
 const StyledTerminal = styled.div`
@@ -84,16 +88,19 @@ const StyledTerminal = styled.div`
   position: absolute;
 
   width: 640px;
-  height: 480px;
+  height: 280px;
 
-  box-shadow: 0 22px 70px 4px rgba(0, 0, 0, 0.56);
+  border-radius: 5px;
+
+  box-shadow: 0 0 1px rgba(0, 0, 0, 0.26), 0 0 5px rgba(0, 0, 0, 0.16),
+    0 8px 10px rgba(0, 0, 0, 0.06), 0 55px 65px rgba(0, 0, 0, 0.48);
 `
 
 const Terminal: React.FC = () => {
   const [state, setState] = useState({
     isDragging: false,
-    dX: 20,
-    dY: 20,
+    dX: 80,
+    dY: 80,
   })
 
   const onMouseMove = useCallback(

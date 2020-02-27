@@ -1,5 +1,7 @@
 import { createGlobalStyle } from 'styled-components'
 
+import { monoFontFaces } from '@styles'
+
 const GlobalStyle = createGlobalStyle`
   /*! normalize.css v8.0.1 | MIT License | github.com/necolas/normalize.css */
 
@@ -10,6 +12,8 @@ const GlobalStyle = createGlobalStyle`
   * 1. Correct the line height in all browsers.
   * 2. Prevent adjustments of font size after orientation changes in iOS.
   */
+
+  ${monoFontFaces}
 
   html {
     line-height: 1.15; /* 1 */
@@ -29,6 +33,8 @@ const GlobalStyle = createGlobalStyle`
     margin: 0;
 
     overflow-x: hidden;
+
+    background: #e0e0e0;
   }
 
   /**

@@ -15,6 +15,8 @@
         "@components": ["components"],
         "@components/*": ["components/*"],
         "@pages": ["pages"],
+        "@styles": ["styles"],
+        "@styles/*": ["styles/*"],
       },
       "noEmit": true,
       "sourceMap": true,
@@ -29,4 +31,3 @@
     ],
     "include": ["./src"]
   }
-  

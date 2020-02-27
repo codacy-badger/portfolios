@@ -6,7 +6,6 @@
  */
 
 import React from 'react'
-import { useStaticQuery, graphql } from 'gatsby'
 
 import GlobalStyle from './GlobalStyle'
 import Header from './Header'
@@ -16,20 +15,10 @@ interface LayoutProps {
 }
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
-  const data = useStaticQuery(graphql`
-    query SiteTitleQuery {
-      site {
-        siteMetadata {
-          title
-        }
-      }
-    }
-  `)
-
   return (
     <>
       <GlobalStyle />
-      <Header siteTitle={data.site.siteMetadata.title} />
+      <Header />
       <div
         style={{
           margin: `0 auto`,
@@ -38,13 +27,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         }}
       >
         <main>{children}</main>
-        <footer>
-          <span>©</span>
-          <span>{new Date().getFullYear()}</span>
-          <span>, Built with</span>
-          {` `}
-          <a href="https://www.gatsbyjs.org">Gatsby</a>
-        </footer>
       </div>
     </>
   )

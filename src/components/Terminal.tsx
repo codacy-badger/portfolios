@@ -65,11 +65,12 @@ const StyledHeading = styled.div`
 `
 
 const StyledConsole = styled.p`
+  display: block;
   padding: 0.5rem;
 
-  font-family: Monaco, Menlo, monospace;
+  font-family: 'SF Mono', Monaco, Menlo, monospace;
   font-weight: normal;
-  font-size: 12px;
+  font-size: 14px;
 
   color: #fafafa;
   background: #202020;
@@ -80,6 +81,29 @@ const StyledConsole = styled.p`
 
   border-bottom-right-radius: 5px;
   border-bottom-left-radius: 5px;
+
+  outline: none;
+  overflow-y: scroll;
+  overflow-wrap: break-word;
+
+  &::-webkit-scrollbar {
+    width: 10px;
+    border-radius: 50%;
+  }
+
+  &::-webkit-scrollbar-track {
+    border: 1px solid #000;
+    padding: 2px 0;
+    background-color: #404040;
+    border-radius: 5px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    border-radius: 5px;
+    box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+    background-color: #737272;
+    border: 1px solid #000;
+  }
 `
 
 const StyledTerminal = styled.div`
@@ -102,6 +126,63 @@ const Terminal: React.FC = () => {
     dX: 80,
     dY: 80,
   })
+
+  const [text, setText] = useState('portfoliOS@~ root$ ')
+  const [command, setCommand] = useState('')
+
+  const unregisterableKeys = [
+    'Enter',
+    'Backspace',
+    'Control',
+    'Shift',
+    'Command',
+    'Meta',
+    'Alt',
+    'Escape',
+  ]
+
+  const commands = ['clear', 'ls', 'sysinfo']
+
+  const handleKeyPress = (e: KeyboardEvent): void => {
+    e.preventDefault()
+
+    if (e.key === 'Enter') {
+      const parsedCommand = command.split(' ')
+
+      if (parsedCommand[0] === 'clear') {
+        setText(`portfoliOS@~ root$ `)
+      } else if (parsedCommand[0] === 'help') {
+        setText(
+          `${text}\n${parsedCommand[0]}: Command not found\nportfoliOS@~ root$ `
+        )
+      } else if (parsedCommand[0] === 'echo') {
+        setText(
+          `${text}\n${parsedCommand.slice(1).join(' ')}\nportfoliOS@~ root$ `
+        )
+      } else if (parsedCommand[0] === 'sysinfo') {
+        if (parsedCommand[1] === '--author' || parsedCommand[1] === '-a') {
+          setText(`${text}\nRichard Nguyen\nportfoliOS@~ root$ `)
+        } else {
+          setText(
+            `${text}\nAuthor: Richard Nguyen\nLanguage: Typescript\nFramework: Gatsby, Styled-components\nRepository: https//github.com/richardnguyen99/portfolios\nportfoliOS@~ root$ `
+          )
+        }
+      } else {
+        setText(
+          `${text}\n${parsedCommand[0]}: Command not found\nportfoliOS@~ root$ `
+        )
+      }
+      setCommand('')
+    } else if (e.key === 'Backspace') {
+      if (command !== '') {
+        setText(text.substring(0, text.length - 1))
+        setCommand(command.substring(0, command.length - 1))
+      }
+    } else if (!unregisterableKeys.includes(e.key)) {
+      setText(text + e.key)
+      setCommand(command + e.key)
+    }
+  }
 
   const onMouseMove = useCallback(
     e => {
@@ -142,6 +223,14 @@ const Terminal: React.FC = () => {
     }
   }, [onMouseMove, onMouseUp])
 
+  useEffect(() => {
+    document.addEventListener('keydown', handleKeyPress, false)
+
+    return (): void => {
+      document.removeEventListener('keydown', handleKeyPress, false)
+    }
+  }, [handleKeyPress])
+
   return (
     <StyledTerminal
       style={{
@@ -157,7 +246,15 @@ const Terminal: React.FC = () => {
         </StyledBtnContainer>
         <StyledTitle>Children</StyledTitle>
       </StyledHeading>
-      <StyledConsole>Hello</StyledConsole>
+      <StyledConsole>
+        {text !== '' && text.includes('\n') ? (
+          text.split('\n').map(i => {
+            return <p>{`${i}`}</p>
+          })
+        ) : (
+          <p>{`${text}`}</p>
+        )}
+      </StyledConsole>
     </StyledTerminal>
   )
 }

@@ -1,5 +1,11 @@
-import React, { useState, useCallback, useEffect } from 'react'
-import styled from 'styled-components'
+import React, { useState, useCallback, useRef, useEffect } from 'react'
+import styled, { keyframes } from 'styled-components'
+
+const blink = keyframes`
+  0% { opacity: 1.0; }
+  50% { opacity: 0.0; }
+  100% { opacity: 1.0; }
+`
 
 const StyledBtn = styled.button`
   border-radius: 50%;
@@ -106,6 +112,22 @@ const StyledConsole = styled.p`
   }
 `
 
+const StyledConsoleLine = styled.p`
+  display: inline-block;
+  position: relative;
+
+  top: 2px;
+  right: 0;
+  background-color: #fafafa;
+  vertical-align: top;
+  width: 8px;
+  height: 14px;
+
+  margin: 0;
+
+  animation: ${blink} 1s step-end infinite;
+`
+
 const StyledTerminal = styled.div`
   display: block;
 
@@ -127,8 +149,25 @@ const Terminal: React.FC = () => {
     dY: 80,
   })
 
+  const [blinking, setBlinking] = useState(true)
   const [text, setText] = useState('portfoliOS@~ root$ ')
   const [command, setCommand] = useState('')
+
+  const scrollRef = useRef<HTMLDivElement>(null)
+
+  const handleScrolling = (): void => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollIntoView({ behavior: 'smooth' })
+    }
+  }
+
+  const isBlinking = (): boolean => {
+    setTimeout(() => {
+      setBlinking(!blinking)
+      return blinking
+    }, 300)
+    return blinking
+  }
 
   const unregisterableKeys = [
     'Enter',
@@ -231,6 +270,8 @@ const Terminal: React.FC = () => {
     }
   }, [handleKeyPress])
 
+  useEffect(handleScrolling, [text])
+
   return (
     <StyledTerminal
       style={{
@@ -248,12 +289,21 @@ const Terminal: React.FC = () => {
       </StyledHeading>
       <StyledConsole>
         {text !== '' && text.includes('\n') ? (
-          text.split('\n').map(i => {
-            return <p>{`${i}`}</p>
+          text.split('\n').map((i, key) => {
+            return (
+              <div>
+                {`${i}`}
+                {key === text.split('\n').length - 1 && <StyledConsoleLine />}
+              </div>
+            )
           })
         ) : (
-          <p>{`${text}`}</p>
+          <p>
+            {`${text}`}
+            <StyledConsoleLine />
+          </p>
         )}
+        <div ref={scrollRef} />
       </StyledConsole>
     </StyledTerminal>
   )

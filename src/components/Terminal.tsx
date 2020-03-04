@@ -16,6 +16,10 @@ const StyledBtn = styled.button`
 
   padding: 0;
   margin-right: 0.5rem;
+
+  &.deactive {
+    background: rgba(142, 142, 147, 1);
+  }
 `
 
 const StyledBtnRed = styled(StyledBtn)`
@@ -139,7 +143,12 @@ const StyledTerminal = styled.div`
   border-radius: 5px;
 
   box-shadow: 0 0 1px rgba(0, 0, 0, 0.26), 0 0 5px rgba(0, 0, 0, 0.16),
-    0 8px 10px rgba(0, 0, 0, 0.06), 0 55px 65px rgba(0, 0, 0, 0.48);
+    0 8px 10px rgba(0, 0, 0, 0.06), 0 55px 65px rgba(0, 0, 0, 0.68);
+
+  &.active {
+    box-shadow: 0 0 1px rgba(0, 0, 0, 0.26), 0 0 5px rgba(0, 0, 0, 0.16),
+      0 8px 10px rgba(0, 0, 0, 0.06), 0 55px 65px rgba(0, 0, 0, 0);
+  }
 `
 
 const Terminal: React.FC = () => {
@@ -149,11 +158,12 @@ const Terminal: React.FC = () => {
     dY: 80,
   })
 
-  const [blinking, setBlinking] = useState(true)
+  const [click, setClick] = useState(false)
   const [text, setText] = useState('portfoliOS@~ root$ ')
   const [command, setCommand] = useState('')
 
   const scrollRef = useRef<HTMLDivElement>(null)
+  const focusRef = useRef<HTMLDivElement>(null)
 
   const handleScrolling = (): void => {
     if (scrollRef.current) {
@@ -161,12 +171,24 @@ const Terminal: React.FC = () => {
     }
   }
 
-  const isBlinking = (): boolean => {
-    setTimeout(() => {
-      setBlinking(!blinking)
-      return blinking
-    }, 300)
-    return blinking
+  const handleClick = (
+    e: React.MouseEvent<HTMLDivElement, MouseEvent>
+  ): void => {
+    e.preventDefault()
+    if (!click) {
+      setClick(true)
+    }
+  }
+
+  const handleClickOutSide = (e: MouseEvent): void => {
+    // https://stackoverflow.com/questions/43842057/detect-if-click-was-inside-react-component-or-not-in-typescript
+    if (
+      click &&
+      focusRef.current &&
+      !focusRef.current.contains(e.target as Node)
+    ) {
+      setClick(false)
+    }
   }
 
   const unregisterableKeys = [
@@ -179,8 +201,6 @@ const Terminal: React.FC = () => {
     'Alt',
     'Escape',
   ]
-
-  const commands = ['clear', 'ls', 'sysinfo']
 
   const handleKeyPress = (e: KeyboardEvent): void => {
     e.preventDefault()
@@ -272,8 +292,19 @@ const Terminal: React.FC = () => {
 
   useEffect(handleScrolling, [text])
 
+  useEffect(() => {
+    document.addEventListener('mousedown', handleClickOutSide)
+
+    return (): void => {
+      document.removeEventListener('mousedown', handleClickOutSide)
+    }
+  }, [handleClickOutSide])
+
   return (
     <StyledTerminal
+      ref={focusRef}
+      onClick={handleClick}
+      className={!click ? 'active' : ''}
       style={{
         left: `${state.dX.toString().concat('px')}`,
         top: `${state.dY.toString().concat('px')}`,
@@ -281,9 +312,9 @@ const Terminal: React.FC = () => {
     >
       <StyledHeading onMouseDown={onMouseDown}>
         <StyledBtnContainer>
-          <StyledBtnRed />
-          <StyledBtnYellow />
-          <StyledBtnGreen />
+          <StyledBtnRed className={!click ? 'deactive' : ''} />
+          <StyledBtnYellow className={!click ? 'deactive' : ''} />
+          <StyledBtnGreen className={!click ? 'deactive' : ''} />
         </StyledBtnContainer>
         <StyledTitle>Children</StyledTitle>
       </StyledHeading>
@@ -293,15 +324,17 @@ const Terminal: React.FC = () => {
             return (
               <div>
                 {`${i}`}
-                {key === text.split('\n').length - 1 && <StyledConsoleLine />}
+                {key === text.split('\n').length - 1 && click && (
+                  <StyledConsoleLine />
+                )}
               </div>
             )
           })
         ) : (
-          <p>
+          <div>
             {`${text}`}
-            <StyledConsoleLine />
-          </p>
+            {click && <StyledConsoleLine />}
+          </div>
         )}
         <div ref={scrollRef} />
       </StyledConsole>

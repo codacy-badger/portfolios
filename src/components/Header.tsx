@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react'
-import styled from 'styled-components'
+/* eslint-disable react/jsx-props-no-spreading */
+import React, { useState, useEffect, useRef } from 'react'
+import styled, { StyledComponent } from 'styled-components'
 import Icon, { Octoface, Calendar, Gear, Clock } from '@primer/octicons-react'
 import { Link } from 'gatsby'
 
@@ -62,13 +63,66 @@ const StyledItem = styled.li`
 
   text-decoration: none;
 
+  transition: all 100ms ease-in-out;
+
+  &.active {
+    background: #e6e6e6;
+    color: #020202;
+    border: none;
+  }
+
   p {
     margin-top: 0;
     margin-right: 0;
     margin-left: 0.375rem;
     margin-bottom: 0;
+
+    &:hover {
+      cursor: default;
+    }
   }
 `
+
+const StyledClickableItem: React.FC<{ [a: string]: any }> = ({
+  children,
+  ...rest
+}) => {
+  const ref = useRef<HTMLLIElement>(null)
+  const [click, setClick] = useState(false)
+
+  const handleClick = (
+    e: React.MouseEvent<HTMLLIElement, MouseEvent>
+  ): void => {
+    e.preventDefault()
+    setClick(!click)
+  }
+
+  const handleClickOutSide = (e: MouseEvent): void => {
+    // https://stackoverflow.com/questions/43842057/detect-if-click-was-inside-react-component-or-not-in-typescript
+    if (click && ref.current && !ref.current.contains(e.target as Node)) {
+      setClick(false)
+    }
+  }
+
+  useEffect(() => {
+    document.addEventListener('mousedown', handleClickOutSide)
+
+    return (): void => {
+      document.removeEventListener('mousedown', handleClickOutSide)
+    }
+  }, [handleClickOutSide])
+
+  return (
+    <StyledItem
+      ref={ref}
+      className={click ? 'active' : ''}
+      onClick={handleClick}
+      {...rest}
+    >
+      {children}
+    </StyledItem>
+  )
+}
 
 const Header: React.FC = () => {
   const [date, setDate] = useState(new Date())
@@ -107,26 +161,29 @@ const Header: React.FC = () => {
   return (
     <StyledNavbar>
       <StyledControlBrandGroup>
-        <StyledItem as="a" href="https://github.com/richardnguyen99/portfolios">
+        <StyledClickableItem
+          as="a"
+          href="https://github.com/richardnguyen99/portfolios"
+        >
           <Icon icon={Octoface} />
           <p>PortfoliOS</p>
-        </StyledItem>
+        </StyledClickableItem>
       </StyledControlBrandGroup>
       <StyledControllGroup style={{ flexShrink: 0 }}>
-        <StyledItem>
+        <StyledClickableItem>
           <Icon icon={Calendar} />
           <p>{convertDate(date)}</p>
-        </StyledItem>
+        </StyledClickableItem>
       </StyledControllGroup>
       <StyledControlConfigGroup>
-        <StyledItem style={{ marginRight: '0.5rem' }}>
+        <StyledClickableItem style={{ marginRight: '1rem' }}>
           <Icon icon={Gear} />
           <p>Config</p>
-        </StyledItem>
-        <StyledItem>
+        </StyledClickableItem>
+        <StyledClickableItem>
           <Icon icon={Clock} />
           <p>{date.toLocaleTimeString()}</p>
-        </StyledItem>
+        </StyledClickableItem>
       </StyledControlConfigGroup>
     </StyledNavbar>
   )
